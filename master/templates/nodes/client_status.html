@@ -1,0 +1,210 @@
+{% extends "base_back.html" %}
+
+{% block content_header %}
+    <h1>Client Status</h1>
+{% endblock %}
+
+{% block content_body %}
+    <!--charts-->
+    <div class="box">
+        <div class="box-header">
+            <ul id="deltaTab" class="nav nav-tabs">
+                <li class="active"><a href="#" data-toggle="tab" data-delta="1H">1小时</a></li>
+                <li><a href="#" data-toggle="tab" data-delta="6H">6小时</a></li>
+                <li><a href="#" data-toggle="tab" data-delta="12H">12小时</a></li>
+                <li><a href="#" data-toggle="tab" data-delta="1D">1天</a></li>
+                <li><a href="#" data-toggle="tab" data-delta="3D">3天</a></li>
+                <li><a href="#" data-toggle="tab" data-delta="1W">7天</a></li>
+            </ul>
+
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                    <i class="fa fa-minus"></i>
+                </button>
+            </div>
+        </div>
+        <div class="box-body table-responsive">
+            <!-- 为 ECharts 准备一个具备大小（宽高）的 DOM -->
+            <div id="chart_cpu" style="height:300px;width: auto;"></div>
+            <div id="chart_virtual_memory" style="height:300px;width: auto;"></div>
+            <div id="chart_swap_memory" style="height:300px;width: auto;"></div>
+            <div id="chart_disk_usage" style="height:300px;width: auto;"></div>
+            <div id="chart_disk_io_read" style="height:300px;width: auto;"></div>
+            <div id="chart_disk_io_write" style="height:300px;width: auto;"></div>
+            <div id="chart_net_io_sent" style="height:300px;width: auto;"></div>
+            <div id="chart_net_io_receive" style="height:300px;width: auto;"></div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    <!-- eCharts 4.1.0.rc2 -->
+    <script src="{{ url_for('static', filename='echarts_4.1.0.rc2/echarts.min.js') }}"></script>
+    <script>
+        //初始化，document加载完成后执行
+        $(function () {
+            initCharts();
+            $("ul#deltaTab a").click(function () {
+                $("ul#deltaTab li.active").removeClass("active");
+                $(this).parent().addClass("active");
+                initCharts();
+            });
+        });
+
+        // 基于准备好的dom，初始化echarts实例
+        var myCharts = {
+            cpu: echarts.init(document.getElementById('chart_cpu')),
+            virtual_memory: echarts.init(document.getElementById('chart_virtual_memory')),
+            swap_memory: echarts.init(document.getElementById('chart_swap_memory')),
+            disk_usage: echarts.init(document.getElementById('chart_disk_usage')),
+            disk_io_read: echarts.init(document.getElementById('chart_disk_io_read')),
+            disk_io_write: echarts.init(document.getElementById('chart_disk_io_write')),
+            net_io_sent: echarts.init(document.getElementById('chart_net_io_sent')),
+            net_io_receive: echarts.init(document.getElementById('chart_net_io_receive'))
+        };
+        // 自定义配置参数
+        var chartsArgs = {
+            cpu: ['CPU使用率(%)', "%"],
+            virtual_memory: ['物理内存使用率(%)', "%"],
+            swap_memory: ['交换内存使用率(%)', "%"],
+            disk_usage: ['磁盘存储使用率(%)', "%"],
+            disk_io_read: ['磁盘IO读字节数(KBps)', "KBps"],
+            disk_io_write: ['磁盘IO读字节数(KBps)', "KBps"],
+            net_io_sent: ['网络流出速率(Kbps)', "Kbps"],
+            net_io_receive: ['网络流入速率(Kbps)', "Kbps"]
+        };
+        // 指定图表的配置项和数据
+        var option = {
+            tooltip: {
+                trigger: 'axis',
+                formatter: function (params) {
+                    var str_formatter = params[0].name;
+                    for (var i = 0; i < params.length; i++) {
+                        str_formatter += '<br />' + params[i].seriesName + ':' + params[i].value[1] + '%';
+                    }
+                    return str_formatter;
+                },
+                axisPointer: {animation: false}
+            },
+            legend: {
+                data: []
+            },
+            toolbox: {
+                show: true,
+                feature: {
+                    saveAsImage: {}
+                }
+            },
+            xAxis: {
+                type: 'time',
+                splitLine: {
+                    show: false
+                }
+            },
+            yAxis: {
+                type: 'value',
+                splitLine: {
+                    show: false
+                }
+            },
+            series: [
+                {
+                    name: '模拟数据',
+                    type: 'line',
+                    smooth: true,
+                    showSymbol: false,
+                    hoverAnimation: false,
+                    data: []
+                }
+            ]
+        };
+
+        function initCharts() {
+            $.each(myCharts, function (key, chart) {
+                chart.clear();
+                // 首次显示加载动画
+                chart.showLoading();
+                // 使用刚指定的配置项和数据显示图表
+                chart.setOption(option);
+                var title = chartsArgs[key][0];
+                var unit = chartsArgs[key][1];
+                chart.setOption({
+                    title: {text: title},
+                    tooltip: {
+                        formatter: function (params) {
+                            var str_formatter = params[0].name;
+                            for (var i = 0; i < params.length; i++) {
+                                str_formatter += '<br />' + params[i].seriesName + ':' + params[i].value[1].toFixed(2) + unit;
+                            }
+                            return str_formatter;
+                        }
+                    }
+                });
+            });
+            renderingChats();
+        }
+
+        function renderingChats() {
+            var delta = $("ul#deltaTab li.active a").attr('data-delta');
+            if (!delta) {
+                delta = '1H';
+            }
+            $.ajax({
+                type: "post",
+                async: true,
+                url: "index",
+                data: {delta: delta},
+                dataType: "json",
+                success: function (result) {
+                    if (!result) {
+                        return;
+                    }
+                    // console.log(result);
+                    $.each(result, function (key, values) {
+                        if (!myCharts[key]) {
+                            return true;
+                        }
+                        var legendData = [];
+                        var seriesList = [];
+                        $.each(values, function (host, value) {
+                            // key值 value值
+                            legendData.push(host);
+                            var seriesData = [];
+                            $.each(value, function (num, item) {
+                                //数组下标 数组元素值
+                                seriesData.push({
+                                    name: item[0],
+                                    value: [new Date(item[0]), item[1]]
+                                });
+                            });
+                            seriesList.push({
+                                name: host,
+                                type: 'line',
+                                smooth: true,
+                                showSymbol: false,
+                                hoverAnimation: false,
+                                data: seriesData
+                            })
+                        });
+
+                        myCharts[key].hideLoading();
+                        myCharts[key].setOption({
+                            legend: {data: legendData},
+                            series: seriesList
+                        });
+                    });
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    //请求失败时执行该函数
+                    alert("图表请求数据失败，可能是服务器开小差了\r\n" + textStatus + "\r\n" + errorThrown);
+                },
+                complete: function (XMLHttpRequest, textStatus) {
+                    // 调用本次AJAX请求时传递的options参数
+                }
+            });
+        }
+
+        // 设置定时刷新
+        setInterval(renderingChats, 30000);
+    </script>
+{% endblock %}

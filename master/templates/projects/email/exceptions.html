@@ -1,0 +1,22 @@
+{% for exception in exceptions %}
+    <dl>
+        <dt>Salve</dt>
+        <dd>{{ exception.host_port }}</dd>
+        <dt>Project</dt>
+        <dd>{{ exception.project_name }}</dd>
+        <dt>Version</dt>
+        <dd>{{ exception.version_name }}</dd>
+        <dt>Spider</dt>
+        <dd>{{ exception.spider_name }}</dd>
+        <dt>Job</dt>
+        <dd>{{ exception.job_id }}</dd>
+        <dt>ExcTime</dt>
+        <dd>{{ exception.exc_time }}</dd>
+        <dt>ExcLevel</dt>
+        <dd>{{ exception.exc_level }}</dd>
+        <dt>ExcMessage</dt>
+        <dd>{{ exception.exc_message }}</dd>
+        <dt>Remark</dt>
+        <dd>{{ exception.remark }}</dd>
+    </dl>
+{% endfor %}

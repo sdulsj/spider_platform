@@ -1,0 +1,174 @@
+{% extends "base_back.html" %}
+
+{% block content_header %}
+<h1>系统异常</h1>
+<div class="input-group col-md-3" style="float: right;margin-top:-30px">
+    <input type="text" id="searchString" class="form-control" placeholder="请输入字段名">
+    <span class="input-group-btn">
+                   <button class="btn btn-info" id="searchButton">查找</button>
+                </span>
+</div>
+{% endblock %}
+
+{% block content_body %}
+<!--List-->
+<div class="box">
+    <div class="box-header">
+        <h3 class="box-title">System Exception</h3>
+        <div class="box-tools pull-right">
+            <label>
+                <select id="dataType" size="1">
+                    <option selected="selected" value="0">待处理</option>
+                    <option value="1">已关闭</option>
+                </select>
+            </label>
+            <label>
+                <select id="pageSize" size="1">
+                    <option selected="selected" value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </label>
+            <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                <i class="fa fa-minus"></i>
+            </button>
+        </div>
+    </div>
+    <div class="box-body table-responsive">
+        <table class="table table-striped">
+            <thead id="tHead">
+            <tr>
+                <th style="width: 80px">标识</th>
+                <th style="width: 120px">异常时间</th>
+                <th style="width: 80px">异常等级</th>
+                <th style="width: 80px">异常信息</th>
+                <th style="width: 80px">备注</th>
+                <th style="width: 120px">操作</th>
+            </tr>
+            </thead>
+            <tbody id="tBody"></tbody>
+        </table>
+        <ul class="pagination" id="pager"></ul>
+    </div>
+</div>
+<!--Modal-->
+<div class="modal fade" role="dialog" id="errorModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form action="/sys/exception/action" method="post">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span></button>
+                    <h4 class="modal-title">关闭异常</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="vc_md5">标识</label>
+                        <input type="text" name="vc_md5" id="vc_md5" class="form-control" readonly
+                               placeholder="">
+                    </div>
+                    <div class="form-group">
+                        <label for="exc_time">异常时间</label>
+                        <input type="text" name="exc_time" id="exc_time" class="form-control" readonly
+                               placeholder="">
+                    </div>
+                    <div class="form-group">
+                        <label for="exc_level">异常等级</label>
+                        <input type="text" name="exc_level" id="exc_level" class="form-control" readonly
+                               placeholder="">
+                    </div>
+                    <div class="form-group">
+                        <label for="exc_message">异常信息</label>
+                        <textarea rows="5" style="resize:none;overflow-x:hidden;overflow-y: scroll;"
+                                  name="exc_message" id="exc_message" class="form-control" readonly
+                                  placeholder="">
+                        </textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="remark">备注</label>
+                        <textarea rows="5" style="resize:none;overflow-x:hidden;overflow-y: scroll;"
+                                  name="remark" id="remark" class="form-control" placeholder="">
+                        </textarea>
+                    </div>
+                    <div class="checkbox">
+                        <label><input type="checkbox" name="is_closed" id="is_closed" checked>关闭异常</label>
+                    </div>
+                    <input type="hidden" name="act" id="act" value="upd">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
+                    <button type="submit" class="btn btn-primary">提交</button>
+                </div>
+            </form>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+    //初始化，document加载完成后执行
+    $(function () {
+        // 初始化页面数据查询
+        pageSearch(null, 1);
+        $('#searchButton').on('click', pageSearch);
+        $('#dataType').change(pageSearch);
+        $('#pageSize').change(pageSearch);
+        $('#errorModal').on({
+            'show.bs.modal': function (event) {
+                var data = JSON.parse(decodeURI($(event.relatedTarget).data('wrap')));
+                var modal = $(this);
+                modal.find("#vc_md5").val(data.vc_md5);
+                modal.find("#exc_time").val(data.exc_time);
+                modal.find("#exc_level").val(data.exc_level);
+                modal.find("#exc_message").val(data.exc_message);
+                modal.find("#is_closed").val(data.is_closed);
+                modal.find("#remark").val(data.remark);
+            },
+            'hide.bs.modal': function () {
+                var modal = $(this);
+                modal.find("#vc_md5").val(null);
+                modal.find("#exc_time").val(null);
+                modal.find("#exc_level").val(null);
+                modal.find("#exc_message").val(null);
+                modal.find("#is_closed").val(false);
+                modal.find("#remark").val(null);
+            }
+        });
+    });
+
+    //初始化异常列表
+    function initData(dataList) {
+        var tBody = $("#tBody");
+        tBody.empty();
+        var is_closed = parseInt($("#dataType").val());
+        var html = '';
+        //遍历数据添加
+        $.each(dataList, function (key, data) {
+            html += '<tr data-id="' + data.vc_md5 + '">';
+            html += '<td>' + data.vc_md5 + '</td>';
+            html += '<td>' + data.exc_time + '</td>';
+            html += '<td>' + data.exc_level + '</td>';
+            html += '<td><div style="width:80px;white-space: nowrap;text-overflow:ellipsis; overflow:hidden;">' + data.exc_message + '</div></td>';
+            html += '<td><div style="width:120px;white-space: nowrap;text-overflow:ellipsis; overflow:hidden;">' + data.remark + '</div></td>';
+            html += '<td>';
+            if (is_closed === 0) {
+                html += '<a type="button" class="btn btn-info client-error-edit" data-wrap="' + encodeURI(JSON.stringify(data)) + '" data-toggle="modal" data-target="#errorModal">关闭</a>';
+            } else {
+                html += '<a type="button" class="btn btn-danger" data-id="' + data.vc_md5 + '">删除</a>';
+            }
+            html += '</td>';
+            html += '</tr>';
+        });
+        // 装载数据
+        tBody.append(html);
+        // 加载事件
+        tBody.find('.btn-danger').click(delData);
+        return html;
+    }
+
+</script>
+{% endblock %}

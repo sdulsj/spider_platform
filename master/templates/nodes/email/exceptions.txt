@@ -1,0 +1,13 @@
+{% for exception in exceptions %}
+    Salve:{{ exception.host_port }}
+    Type:{{ exception.node_type }}
+    ExcTime:{{ exception.exc_time }}
+    ExcLevel:{{ exception.exc_level }}
+    ExcMessage:
+    {{ exception.exc_message }}
+    Remark:
+    {{ exception.remark }}
+
+    **********************************************************
+
+{% endfor %}

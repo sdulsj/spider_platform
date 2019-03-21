@@ -1,0 +1,147 @@
+{% extends "base_back.html" %}
+
+{% block scripts -%}
+    {{ super() }}
+    <script src="{{ url_for('static', filename='platform_plans.js') }}"></script>
+{%- endblock scripts %}
+
+{% block content_header %}
+    <h1>Plans Manage</h1>
+    <div class="input-group col-md-3" style="float: right;margin-top:-30px">
+        <input type="text" id="searchString" class="form-control" placeholder="Please enter keywords">
+        <span class="input-group-btn">
+                   <button class="btn btn-info" id="searchButton">Search</button>
+                   <button class="btn btn-success" style="margin-left:3px" data-toggle="modal"
+                           data-target="#planModal">Add</button>
+                </span>
+    </div>
+{% endblock %}
+
+{% block content_body %}
+    <!--list-->
+    <div class="box">
+        <div class="box-header">
+            <h3 class="box-title">Plans</h3>
+            <div class="box-tools pull-right">
+                <label>
+                    <select id="pageSize" size="1">
+                        <option selected="selected" value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                </label>
+                <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                    <i class="fa fa-minus"></i>
+                </button>
+            </div>
+        </div>
+        <div class="box-body table-responsive">
+            <table class="table table-striped">
+                <thead id="tHead">
+                <tr>
+                    <th style="width: 30px">Index</th>
+                    <th style="width: 80px">Plan</th>
+                    <th style="width: 80px">Project</th>
+                    <th style="width: 80px">Spider</th>
+                    <th style="width: 80px">Slave</th>
+                    <th style="width: 30px">Priority</th>
+                    <th style="width: 50px">Cron</th>
+                    <th style="width: 30px">Enabled</th>
+                    <th style="width: 120px">Operation</th>
+                </tr>
+                </thead>
+                <tbody id="tBody"></tbody>
+            </table>
+            <ul class="pagination" id="pager"></ul>
+        </div>
+    </div>
+    <!--modal-->
+    <div class="modal fade" role="dialog" id="planModal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form action="{{ url_for('plan.plan_merge') }}" method="post">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span></button>
+                        <h4 class="modal-title">Create Plan</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="plan_name">Plan Name:</label>
+                            <input type="text" name="plan_name" id="plan_name" class="form-control"
+                                   placeholder="Plan Name 5-50个字符（中文/字母/数字/下划线）"
+                                   required="required" pattern="^[\w\u4e00-\u9fa5]{5,20}$"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="project_name">Project Name:</label>
+                            <select class="form-control" name="project_name" id="project_name" required="required">
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="version_name">Version Name:</label>
+                            <select class="form-control" name="version_name" id="version_name" required="required">
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="spider_name">Spider Name:</label>
+                            <select class="form-control" name="spider_name" id="spider_name" required="required">
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="priority">Priority:</label>
+                            <select class="form-control" name="priority" id="priority">
+                                <option label="Low" value="-1">Low</option>
+                                <option label="Normal" value="0" selected="selected">Normal</option>
+                                <option label="High" value="1">High</option>
+                                <option label="Highest" value="2">Highest</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="exec_args">Exec Args:</label>
+                            <input type="text" class="form-control" name="exec_args" id="exec_args"
+                                   placeholder="foo=1,bar=2">
+                        </div>
+                        <div class="form-group">
+                            <label for="host_port">Slave Select：</label>
+                            <select class="form-control" name="host_port" id="host_port">
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="cron_exp">Cron Expression:</label>
+                            <input type="text" name="cron_exp" id="cron_exp" class="form-control"
+                                   placeholder="* * * * *"/>
+                            <p class="help-block">Use<a href="http://cron.qqe2.com/">在线Cron表达式生成器</a></p>
+                        </div>
+                        <div class="checkbox">
+                            <label><input type="checkbox" name="is_enabled" id="is_enabled" checked>Whether to
+                                enable</label>
+                        </div>
+                        <input type="hidden" name="act" id="act" value="add">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary" id="submit">Create</button>
+                    </div>
+                </form>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        //初始化，document加载完成后执行
+        $(function () {
+            // 初始化页面数据查询
+            pageSearch(null, 1);
+            $('#searchButton').on('click', pageSearch);
+            $('#pageSize').change(pageSearch);
+            $('#project_name').change(setVersions);
+            $('#version_name').change(setSpiders);
+            $('#planModal').on({'show.bs.modal': showModel});
+        });
+    </script>
+{% endblock %}

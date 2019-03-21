@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+{% block scripts -%}
+    {{ super() }}
+    <script src="{{ url_for('static', filename='platform.js') }}"></script>
+{%- endblock scripts %}
+
+{% block body -%}
+    <!-- Site wrapper -->
+    <div class="wrapper">
+        {% block navbar %}
+            <header class="main-header">
+                <!-- Logo -->
+                <a href="/" class="logo">
+                    <!-- mini logo for sidebar mini 50x50 pixels -->
+                    <span class="logo-mini"><b>S</b>P</span>
+                    <!-- logo for regular state and mobile devices -->
+                    <span class="logo-lg"><b>Spider</b>Platform</span>
+                </a>
+
+                <!-- Header Navbar: style can be found in header.less -->
+                <nav class="navbar navbar-static-top" role="navigation">
+                    <!-- Sidebar toggle button-->
+                    <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </a>
+                    <!-- Navbar Left Menu -->
+                    <!-- Navbar Right Menu -->
+                    <ul class="nav navbar-nav navbar-right">
+                        {% if current_user.is_authenticated %}
+                            {% if current_user.is_administrator() %}
+                                <li class="dropdown" id="dropDownUsers">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Edit Profile [Admin]</a>
+                                    <ul class="dropdown-menu">
+                                    </ul>
+                                </li>
+                            {% else %}
+                                <li><a href="{{ url_for('auth.edit_profile') }}">Edit Profile</a></li>
+                            {% endif %}
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                    <img src="{{ current_user.gravatar(size=18) }}">Account<b class="caret"></b>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="{{ url_for('auth.change_password') }}">Change Password</a></li>
+                                    <li><a href="{{ url_for('auth.change_email_request') }}">Change Email</a></li>
+                                    <li role="separator" class="divider"></li>
+                                    <li><a href="{{ url_for('auth.logout') }}">Log Out</a></li>
+                                </ul>
+                            </li>
+                        {% else %}
+                            <li><a href="{{ url_for('auth.login') }}">Log In</a></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </header>
+
+            <!-- Left side column. contains the sidebar -->
+            <aside class="main-sidebar">
+                <!-- sidebar: style can be found in sidebar.less -->
+                <section class="sidebar">
+                    <!-- search form -->
+                    <!--<form action="#" method="get" class="sidebar-form">-->
+                    <!--<div class="input-group">-->
+                    <!--<input type="text" name="q" class="form-control" placeholder="搜索...">-->
+                    <!--<span class="input-group-btn">-->
+                    <!--<button type="submit" name="search" id="search-btn" class="btn btn-flat">-->
+                    <!--<i class="fa fa-search"></i>-->
+                    <!--</button>-->
+                    <!--</span>-->
+                    <!--</div>-->
+                    <!--</form>-->
+                    <!-- /.search form -->
+
+                    <!-- sidebar menu: : style can be found in sidebar.less -->
+                    <ul class="sidebar-menu" data-widget="tree">
+                        <li class="header ad-click">导航</li>
+                        <li>
+                            <a href="{{ url_for('main.index') }}" data-title="首页">
+                                <i class="fa fa-dashboard"></i><span>首页</span>
+                            </a>
+                        </li>
+                        <li class="treeview">
+                            <a href="#" data-title="节点">
+                                <i class="fa fa-television"></i><span>节点</span>
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </a>
+                            <ul class="treeview-menu">
+                                <li>
+                                    <a href="{{ url_for('node.node_manage') }}" data-title="节点管理">
+                                        <i class="fa fa-circle-o"></i>节点管理
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ url_for('node.node_exception_manage') }}" data-title="节点异常">
+                                        <i class="fa fa-exclamation"></i>节点异常
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="treeview">
+                            <a href="#" data-title="项目">
+                                <i class="fa fa-product-hunt"></i><span>项目</span>
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </a>
+                            <ul class="treeview-menu">
+                                <li>
+                                    <a href="{{ url_for('project.project_manage') }}" data-title="项目管理">
+                                        <i class="fa fa-circle-o"></i>项目管理
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ url_for('plan.plan_manage') }}" data-title="计划管理">
+                                        <i class="fa fa-tasks"></i>计划管理
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ url_for('job.job_manage') }}" data-title="任务列表">
+                                        <i class="fa fa-list"></i>任务列表
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ url_for('job.job_exception_manage') }}" data-title="任务异常">
+                                        <i class="fa fa-exclamation"></i>任务异常
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="treeview">
+                            <a href="#" data-title="系统">
+                                <i class="fa fa-gears"></i><span>系统</span>
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </a>
+                            <ul class="treeview-menu">
+                                <li>
+                                    <a href="{{ url_for('system.system_settings') }}" data-title="系统设置">
+                                        <i class="fa fa-circle-o"></i>系统设置
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ url_for('system.system_detail_manage') }}" data-title="系统异常">
+                                        <i class="fa fa-exclamation"></i>系统异常
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </section>
+                <!-- /.sidebar -->
+            </aside>
+        {% endblock navbar %}
+
+        {% block content -%}
+            <!-- Content Wrapper. Contains page content -->
+            <div class="content-wrapper">
+                <!-- Content Header (Page header) -->
+                <section class="content-header">
+                    {% block content_header %}{% endblock %}
+                </section>
+
+                <!-- Main content -->
+                <section class="content">
+                    {% for message in get_flashed_messages() %}
+                        <div class="alert alert-warning">
+                            <button type="button" class="close" data-dismiss="alert">&times;</button>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                    {% block content_body %}{% endblock %}
+                </section>
+                <!-- /.content -->
+            </div>
+            <!-- /.content-wrapper -->
+
+            <footer class="main-footer">
+                <div class="pull-right hidden-xs">
+                    <b>Version</b> {{ version }}
+                </div>
+                <strong><a href="#">SpiderPlatform</a>.</strong>
+            </footer>
+        {%- endblock content %}
+
+    </div><!-- ./wrapper -->
+
+    <script>
+        $(document).ready(function () {
+            //$(".sidebar-menu").tree();
+            //$(".sidebar-menu").filter(".menu-open").removeClass("menu-open");
+            //$(".sidebar-menu").filter(".active").removeClass("active");
+            //console.log(window.location.href);
+            $(".sidebar-menu a").each(function () {
+                if (window.location.pathname === $(this).attr("href")) {
+                    $(this).parent().addClass("active");
+                    $(this).parent().parent().parent().addClass("active").addClass("menu-open");
+                    return true;
+                }
+            });
+            $('#dropDownUsers a').click(function (e) {
+                $.post("{{ url_for('auth.get_user_list') }}", function (data) {
+                    let html = "";
+                    $.each(data, function (key, value) {
+                        html += "<li><a href=\"/auth/edit_profile/" + value.id;
+                        html += "\">" + value.username + "</a></li>";
+                    });
+                    $(e.target).parent().find("ul").empty().append(html)
+                });
+            });
+            $("[required]").parent().find("label").append('<b style="color: red">(*)</b>');
+        })
+    </script>
+    {% block script -%}
+    {%- endblock script %}
+{%- endblock body %}
+

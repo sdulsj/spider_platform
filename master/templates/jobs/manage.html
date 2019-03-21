@@ -1,0 +1,80 @@
+{% extends "base_back.html" %}
+
+{% block scripts -%}
+    {{ super() }}
+    <script src="{{ url_for('static', filename='platform_jobs.js') }}"></script>
+{%- endblock scripts %}
+
+{% block content_header %}
+<h1>Jobs List</h1>
+<div class="input-group col-md-3" style="float: right;margin-top:-30px">
+    <input type="text" id="searchString" class="form-control" placeholder="Please enter keywords">
+    <span class="input-group-btn">
+                   <button class="btn btn-info" id="searchButton">Search</button>
+                </span>
+</div>
+{% endblock %}
+
+{% block content_body %}
+<!--list-->
+<div class="box">
+    <div class="box-header">
+        <h3 class="box-title">Job List</h3>
+        <div class="box-tools pull-right">
+            <label>
+                <select id="dataType" size="1">
+                    <option value="pending">pending</option>
+                    <option selected="selected" value="running">running</option>
+                    <option value="finished">finished</option>
+                    <option value="canceled">canceled</option>
+                </select>
+            </label>
+            <label>
+                <select id="pageSize" size="1">
+                    <option selected="selected" value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </label>
+            <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                <i class="fa fa-minus"></i>
+            </button>
+        </div>
+    </div>
+    <div class="box-body table-responsive">
+        <table class="table table-striped">
+            <thead id="tHead">
+            <tr>
+                <th style="width: 30px">Index</th>
+                <th style="width: 80px">JobID</th>
+                <th style="width: 80px">Slave</th>
+                <th style="width: 80px">Project</th>
+                <th style="width: 80px">Spider</th>
+                <th style="width: 80px">Plan</th>
+                <th style="width: 80px">Priority</th>
+                <th style="width: 80px">WaitingTime</th>
+                <th style="width: 80px">StartTime</th>
+                <th style="width: 80px">RunningTime</th>
+                <th style="width: 80px">Log</th>
+            </tr>
+            </thead>
+            <tbody id="tBody"></tbody>
+        </table>
+        <ul class="pagination" id="pager"></ul>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+    //初始化，document加载完成后执行
+    $(function () {
+        // 初始化页面数据查询
+        pageSearch(null, 1);
+        $('#searchButton').on('click', pageSearch);
+        $('#dataType').change(pageSearch);
+        $('#pageSize').change(pageSearch);
+    });
+</script>
+{% endblock %}

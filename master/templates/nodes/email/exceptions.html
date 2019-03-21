@@ -1,0 +1,17 @@
+{% for exception in exceptions %}
+    <dl>
+        <dt>Salve</dt>
+        <dd>{{ exception.host_port }}</dd>
+        <dt>Type</dt>
+        <dd>{{ exception.node_type }}</dd>
+        <dt>ExcTime</dt>
+        <dd>{{ exception.exc_time }}</dd>
+        <dt>ExcLevel</dt>
+        <dd>{{ exception.exc_level }}</dd>
+        <dt>ExcMessage</dt>
+        <dd>{{ exception.exc_message }}</dd>
+        <dt>Remark</dt>
+        <dd>{{ exception.remark }}</dd>
+    </dl>
+
+{% endfor %}

@@ -1,0 +1,70 @@
+{% block doc -%}
+<!DOCTYPE html>
+<html{% block html_attribs %}{% endblock html_attribs %}>
+{%- block html %}
+    <head>
+    {%- block head %}
+        <title>{% block title %}{{title|default}}{% endblock title %}</title>
+
+        {%- block metas %}
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        {%- endblock metas %}
+
+        {%- block styles %}
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+        <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+        <!-- Bootstrap 3.3.7 -->
+        <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+        <!-- Font Awesome 4.7.0 -->
+        <link href="{{ url_for('static', filename='css/font-awesome.min.css') }}" rel="stylesheet">
+        <!-- AdminLTE 2.4.5 -->
+        <!-- Theme style -->
+        <link href="{{ url_for('static', filename='css/AdminLTE.min.css') }}" rel="stylesheet">
+        <!-- AdminLTE Skins. Choose a skin from the css/skins folder instead of downloading all of them to reduce the load. -->
+        <link href="{{ url_for('static', filename='css/skins/_all-skins.min.css') }}" rel="stylesheet">
+        <!-- jQuery UI 1.12.1 -->
+        <link href="{{ url_for('static', filename='css/jquery-ui.min.css') }}" rel="stylesheet">
+        <!-- Bootstrap Select 1.12.4 -->
+        <link href="{{ url_for('static', filename='css/bootstrap-select.min.css') }}" rel="stylesheet" />
+        {%- endblock styles %}
+
+        {%- block scripts %}
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+        <script src="{{ url_for('static', filename='js/html5.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/respond.min.js') }}"></script>
+        <![endif]-->
+
+        <!-- jQuery 3.3.1 -->
+        <script src="{{ url_for('static', filename='js/jquery-3.3.1.min.js') }}"></script>
+        <!-- Bootstrap 3.3.7 -->
+        <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+        {#{{ moment.include_moment() }}#}
+        {#{{ moment.lang("zh-CN") }}#}
+        <!-- AdminLTE App -->
+        <script src="{{ url_for('static', filename='js/AdminLTE.min.js') }}"></script>
+        <!-- jQuery UI 1.12.1 -->
+        <script src="{{ url_for('static', filename='js/jquery-ui.min.js') }}"></script>
+        <!-- Bootstrap Select 1.12.4 -->
+        <script src="{{ url_for('static', filename='js/bootstrap-select.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/i18n/defaults-zh_CN.min.js') }}"></script>
+        {%- endblock scripts %}
+
+    {%- endblock head %}
+    </head>
+    <body{% block body_attribs %} class="hold-transition skin-black-light sidebar-mini"{% endblock body_attribs %}>
+        {% block body -%}
+        {% block navbar %}
+        {%- endblock navbar %}
+        {% block content -%}
+        {%- endblock content %}
+        {% block script -%}
+        {%- endblock script %}
+        {%- endblock body %}
+    </body>
+{%- endblock html %}
+</html>
+{% endblock doc -%}

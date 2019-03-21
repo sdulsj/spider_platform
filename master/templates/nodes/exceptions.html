@@ -1,0 +1,137 @@
+{% extends "base_back.html" %}
+
+{% block scripts -%}
+    {{ super() }}
+    <script src="{{ url_for('static', filename='platform_nodes.js') }}"></script>
+{%- endblock scripts %}
+
+{% block content_header %}
+    <h1>Nodes Exceptions</h1>
+    <div class="input-group col-md-3" style="float: right;margin-top:-30px">
+        <input type="text" id="searchString" class="form-control" placeholder="Please enter keywords">
+        <span class="input-group-btn">
+                   <button class="btn btn-info" id="searchButton">Search</button>
+                </span>
+    </div>
+{% endblock %}
+
+{% block content_body %}
+    <!--list-->
+    <div class="box">
+        <div class="box-header">
+            <h3 class="box-title">Node Exception</h3>
+            <div class="box-tools pull-right">
+                <label>
+                    <select id="dataType" size="1">
+                        <option selected="selected" value="0">Pending</option>
+                        <option value="1">Closed</option>
+                    </select>
+                </label>
+                <label>
+                    <select id="pageSize" size="1">
+                        <option selected="selected" value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                </label>
+                <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                    <i class="fa fa-minus"></i>
+                </button>
+            </div>
+        </div>
+        <div class="box-body table-responsive">
+            <table class="table table-striped">
+                <thead id="tHead">
+                <tr>
+                    <th style="width: 30px">Index</th>
+                    <th style="width: 120px">HostPort</th>
+                    <th style="width: 120px">ExcTime</th>
+                    <th style="width: 80px">ExcLevel</th>
+                    <th style="width: 80px">ExcMessage</th>
+                    <th style="width: 80px">Remark</th>
+                    <th style="width: 120px">Operation</th>
+                </tr>
+                </thead>
+                <tbody id="tBody"></tbody>
+            </table>
+            <ul class="pagination" id="pager"></ul>
+        </div>
+    </div>
+    <!--modal-->
+    <div class="modal fade" role="dialog" id="errorModal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form action="{{ url_for('node.node_exception_update') }}" method="post">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span></button>
+                        <h4 class="modal-title">Close Exception</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="vc_md5">ExcId</label>
+                            <input type="text" name="vc_md5" id="vc_md5" class="form-control" readonly
+                                   placeholder="">
+                        </div>
+                        <div class="form-group">
+                            <label for="host_port">HostPort</label>
+                            <input type="text" name="host_port" id="host_port" class="form-control" readonly
+                                   placeholder="">
+                        </div>
+                        <div class="form-group">
+                            <label for="exc_time">ExcTime</label>
+                            <input type="text" name="exc_time" id="exc_time" class="form-control" readonly
+                                   placeholder="">
+                        </div>
+                        <div class="form-group">
+                            <label for="exc_level">ExcLevel</label>
+                            <input type="text" name="exc_level" id="exc_level" class="form-control" readonly
+                                   placeholder="">
+                        </div>
+                        <div class="form-group">
+                            <label for="exc_message">ExcMessage</label>
+                            <textarea rows="5" style="resize:none;overflow-x:hidden;overflow-y: scroll;"
+                                      name="exc_message" id="exc_message" class="form-control" readonly
+                                      placeholder="">
+                        </textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="remark">Remark</label>
+                            <textarea rows="5" style="resize:none;overflow-x:hidden;overflow-y: scroll;"
+                                      name="remark" id="remark" class="form-control" placeholder="">
+                        </textarea>
+                        </div>
+                        <div class="checkbox">
+                            <label><input type="checkbox" name="is_closed" id="is_closed" checked>Whether to close the exception</label>
+                        </div>
+                        <input type="hidden" name="act" id="act" value="upd">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        //初始化，document加载完成后执行
+        $(function () {
+            // 初始化页面数据查询
+            pageSearchException(null, 1);
+            $('#searchButton').on('click', pageSearchException);
+            $('#dataType').change(pageSearchException);
+            $('#pageSize').change(pageSearchException);
+            $('#errorModal').on({
+                'show.bs.modal': showModalException,
+                'hide.bs.modal': hideModalException
+            });
+        });
+    </script>
+{% endblock %}

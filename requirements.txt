@@ -1,0 +1,6 @@
+scrapy
+twisted
+six
+psutil
+w3lib
+zope

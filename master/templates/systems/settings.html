@@ -1,0 +1,83 @@
+{% extends "base_back.html" %}
+
+{% block content_header %}
+    <h1>System settings</h1>
+{% endblock %}
+
+{% block content_body %}
+    <!--list-->
+    <div class="box">
+        <div class="box-header">
+            <h3 class="box-title">Settings</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                    <i class="fa fa-minus"></i>
+                </button>
+            </div>
+        </div>
+        <form action="{{ url_for('system.system_settings_update') }}" method="post">
+            <div class="box-body">
+                <div class="form-group">
+                    <label for="threshold_cpu">Threshold: CPU>=</label>
+                    <input class="numberSpinner form-control"
+                           name="threshold_cpu" id="threshold_cpu"
+                           style="width:30px;" min="0" max="100" value="{{ threshold_cpu }}">
+                    <label for="threshold_virtual_memory">% Memory>=</label>
+                    <input class="numberSpinner form-control"
+                           name="threshold_virtual_memory" id="threshold_virtual_memory"
+                           style="width:30px;" min="0" max="100" value="{{ threshold_virtual_memory }}">
+                    <label for="threshold_swap_memory">% Swap>=</label>
+                    <input class="numberSpinner form-control"
+                           name="threshold_swap_memory" id="threshold_swap_memory"
+                           style="width:30px;" min="0" max="100" value="{{ threshold_swap_memory }}">
+                    <label>%</label>
+                </div>
+                <div class="form-group">
+                    <label for="threshold_disk_usage">Threshold: Disk Usage>=</label>
+                    <input class="numberSpinner form-control" name="threshold_disk_usage" id="threshold_disk_usage"
+                           style="width:30px;" min="0" max="100" value="{{ threshold_disk_usage }}">
+                    <label for="threshold_disk_io_read">% I/O Read>=</label>
+                    <input class="numberSpinner form-control" name="threshold_disk_io_read" id="threshold_disk_io_read"
+                           style="width:30px;" min="0" value="{{ threshold_disk_io_read }}">
+                    <label for="threshold_disk_io_write">KB/s I/O Write>=</label>
+                    <input class="numberSpinner form-control" name="threshold_disk_io_write"
+                           id="threshold_disk_io_write"
+                           style="width:30px;" min="0" value="{{ threshold_disk_io_write }}">
+                    <label>KB/s</label>
+                </div>
+                <div class="form-group">
+                    <label for="threshold_net_io_sent">Threshold: Net I/O Sent>=</label>
+                    <input class="numberSpinner form-control" name="threshold_net_io_sent" id="threshold_net_io_sent"
+                           style="width:30px;" min="0" value="{{ threshold_net_io_sent }}">
+                    <label for="threshold_net_io_receive">Kb/s I/O Receive>=</label>
+                    <input class="numberSpinner form-control" name="threshold_net_io_receive"
+                           id="threshold_net_io_receive"
+                           style="width:30px;" min="0" value="{{ threshold_net_io_receive }}">
+                    <label>Kb/s</label>
+                </div>
+                <div class="form-group">
+                    <label for="default_recipients">Default exception alert mail recipient:</label>
+                    <input type="text" name="default_recipients" id="default_recipients" class="form-control"
+                           placeholder="" value="{{ default_recipients }}">
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="use_email_alert" id="use_email_alert"{% if use_email_alert %} checked{% endif %}>
+                        Whether to open email alert</label>
+                </div>
+            </div>
+            <div class="box-footer">
+                <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        //初始化，document加载完成后执行
+        $(function () {
+            $(".numberSpinner").spinner();
+        })
+    </script>
+{% endblock %}
